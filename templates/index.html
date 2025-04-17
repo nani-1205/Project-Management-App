@@ -5,12 +5,8 @@
 
     {# Left Panel: Projects #}
     <div class="panel">
-        <div class="panel-header">
-            Projects
-            {# Maybe add a '+' button here later to trigger add form/modal #}
-        </div>
+        <div class="panel-header">Projects</div>
         <div class="panel-content">
-            {# Dynamic Project List #}
             <ul class="project-list">
                 {% if projects %}
                     {% for project in projects %}
@@ -19,87 +15,48 @@
                             {{ project.name | escape }}
                         </a>
                         <div class="project-actions">
-                            <form action="{{ url_for('delete_project', project_id_str=project._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete project \'{{ project.name|escape }}\' and ALL its tasks?');">
-                                <button type="submit" class="btn btn-danger btn-sm" title="Delete Project">Del</button> {# Use smaller button if desired #}
-                            </form>
-                            <button class="btn btn-secondary btn-sm edit-project-btn" title="Edit Project"
+                             <form action="{{ url_for('delete_project', project_id_str=project._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete project \'{{ project.name|escape }}\' and ALL its tasks?');">
+                                <button type="submit" class="btn btn-danger btn-sm" title="Delete Project">Del</button>
+                             </form>
+                            <button type="button" class="btn btn-secondary btn-sm edit-project-btn" title="Edit Project"
                                     data-project-id="{{ project._id }}"
-                                    data-project-data='{{ project | bson_tojson | safe }}'>Edit</button> {# Use smaller button #}
-                        </div>
+                                    data-project-data='{{ project | bson_tojson | safe }}'>Edit</button> {# Important: type="button" for modal triggers #}
+                         </div>
                     </li>
                     {% endfor %}
                 {% else %}
                     <li style="color: #a0b4d0; font-style: italic;">No projects found.</li>
                 {% endif %}
             </ul>
-
-            {# Add New Project Form #}
             <div class="add-form">
                 <div class="add-form-title">Add New Project</div>
                 <form action="{{ url_for('add_project') }}" method="POST">
-                    <div class="form-group">
-                        <label for="projectName">Name:</label>
-                        <input type="text" id="projectName" name="name" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="projectDesc">Description:</label>
-                        <textarea id="projectDesc" name="description" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="projectStatus">Status:</label>
-                        <select id="projectStatus" name="status" class="form-control">
-                            {% for status in options.project_status %}
-                            <option value="{{ status }}" {{ 'selected' if status == 'Planning' }}>{{ status }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    {# Use form-row for dates if desired, or keep stacked #}
-                    <div class="form-group">
-                        <label for="startDate">Start Date:</label>
-                        <input type="date" id="startDate" name="start_date" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="endDate">End Date:</label>
-                        <input type="date" id="endDate" name="end_date" class="form-control">
-                    </div>
+                    <div class="form-group"> <label for="projectName">Name:</label> <input type="text" id="projectName" name="name" class="form-control" required> </div>
+                    <div class="form-group"> <label for="projectDesc">Description:</label> <textarea id="projectDesc" name="description" class="form-control" rows="3"></textarea> </div>
+                    <div class="form-group"> <label for="projectStatus">Status:</label> <select id="projectStatus" name="status" class="form-control"> {% for status in options.project_status %} <option value="{{ status }}" {{ 'selected' if status == 'Planning' }}>{{ status }}</option> {% endfor %} </select> </div>
+                    <div class="form-group"> <label for="startDate">Start Date:</label> <input type="date" id="startDate" name="start_date" class="form-control"> </div>
+                    <div class="form-group"> <label for="endDate">End Date:</label> <input type="date" id="endDate" name="end_date" class="form-control"> </div>
                     <button type="submit" class="btn btn-primary">Add Project</button>
                 </form>
             </div>
-        </div>{# End panel-content #}
+        </div>
     </div>{# End Projects Panel #}
 
 
     {# Right Panel: Tasks #}
     <div class="panel">
         <div class="panel-header">
-            {% if selected_project %}
-                Tasks for: {{ selected_project.name | escape }}
-            {% else %}
-                Tasks
-            {% endif %}
-            {# Maybe add '+' task button here later #}
+            {% if selected_project %} Tasks for: {{ selected_project.name | escape }} {% else %} Tasks {% endif %}
         </div>
         <div class="panel-content">
             {% if selected_project %}
-                {# Task Table #}
                 <table class="task-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>Due Date</th>
-                            <th>Logged</th>
-                            <th>Est.</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
+                    <thead> <tr> <th>Name</th><th>Status</th><th>Priority</th><th>Due Date</th><th>Logged</th><th>Est.</th><th>Actions</th> </tr> </thead>
                     <tbody>
                         {% if tasks %}
                             {% for task in tasks %}
                             <tr>
                                 <td>{{ task.name | escape }}</td>
-                                {# Use lower case for class lookup #}
                                 <td><span class="status-badge status-{{ task.status | lower | replace(' ', '') }}">{{ task.status }}</span></td>
                                 <td><span class="priority-badge priority-{{ task.priority | lower }}">{{ task.priority }}</span></td>
                                 <td>{{ task.due_date | dateformat }}</td>
@@ -107,10 +64,12 @@
                                 <td>{{ task.estimated_hours ~ 'h' if task.estimated_hours is not none else '–' }}</td>
                                 <td>
                                     <div class="action-buttons">
-                                        {# Add real functionality later #}
-                                        <button class="action-btn edit-task-btn" data-task-id="{{ task._id }}">Edit</button>
-                                        <button class="action-btn delete-task-btn" data-task-id="{{ task._id }}">Del</button>
-                                        <button class="action-btn log-time-btn" data-task-id="{{ task._id }}">Log</button>
+                                        <button type="button" class="action-btn edit-task-btn" title="Edit Task" data-task-id="{{ task._id }}" data-task-data='{{ task | bson_tojson | safe }}'>Edit</button> {# Use type="button" #}
+                                        <form action="{{ url_for('delete_task', task_id_str=task._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete task \'{{ task.name|escape }}\'?');">
+                                             <input type="hidden" name="project_id_for_redirect" value="{{ selected_project._id }}">
+                                             <button type="submit" class="action-btn delete-task-btn" title="Delete Task" style="color:#dc3545;">Del</button> {# Style delete link #}
+                                        </form>
+                                        <button type="button" class="action-btn log-time-btn" title="Log Time" data-task-id="{{ task._id }}" data-task-name="{{ task.name | escape }}">Log</button> {# Use type="button" #}
                                     </div>
                                 </td>
                             </tr>
@@ -121,93 +80,82 @@
                     </tbody>
                 </table>
 
-                {# Add New Task Form #}
                 <div class="add-form">
                     <div class="add-form-title">Add New Task to {{ selected_project.name | escape }}</div>
                     <form action="{{ url_for('add_task', project_id_str=selected_project._id) }}" method="POST">
-                        <div class="form-group">
-                            <label for="taskName">Name:</label>
-                            <input type="text" id="taskName" name="name" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskDesc">Description:</label>
-                            <textarea id="taskDesc" name="description" class="form-control" rows="2"></textarea>
+                        <div class="form-group"> <label for="taskName">Name:</label> <input type="text" id="taskName" name="name" class="form-control" required> </div>
+                        <div class="form-group"> <label for="taskDesc">Description:</label> <textarea id="taskDesc" name="description" class="form-control" rows="2"></textarea> </div>
+                        <div class="form-row">
+                            <div class="form-group"> <label for="taskStatus">Status:</label> <select id="taskStatus" name="status" class="form-control"> {% for status in options.task_status %} <option value="{{ status }}" {{ 'selected' if status == 'To Do' }}>{{ status }}</option> {% endfor %} </select> </div>
+                            <div class="form-group"> <label for="taskPriority">Priority:</label> <select id="taskPriority" name="priority" class="form-control"> {% for priority in options.task_priority %} <option value="{{ priority }}" {{ 'selected' if priority == 'Medium' }}>{{ priority }}</option> {% endfor %} </select> </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="taskStatus">Status:</label>
-                                <select id="taskStatus" name="status" class="form-control">
-                                    {% for status in options.task_status %}
-                                    <option value="{{ status }}" {{ 'selected' if status == 'To Do' }}>{{ status }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="taskPriority">Priority:</label>
-                                <select id="taskPriority" name="priority" class="form-control">
-                                    {% for priority in options.task_priority %}
-                                    <option value="{{ priority }}" {{ 'selected' if priority == 'Medium' }}>{{ priority }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="taskDueDate">Due Date:</label>
-                                <input type="date" id="taskDueDate" name="due_date" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="taskHours">Est. Hours:</label>
-                                <input type="number" id="taskHours" name="estimated_hours" class="form-control" placeholder="e.g. 4 or 2.5" step="0.1" min="0">
-                            </div>
+                            <div class="form-group"> <label for="taskDueDate">Due Date:</label> <input type="date" id="taskDueDate" name="due_date" class="form-control"> </div>
+                            <div class="form-group"> <label for="taskHours">Est. Hours:</label> <input type="number" id="taskHours" name="estimated_hours" class="form-control" placeholder="e.g. 4 or 2.5" step="0.1" min="0"> </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Task</button>
                     </form>
                 </div>
-
             {% else %}
-                {# Message when no project is selected #}
                 <p style="text-align: center; color: #a0b4d0; margin-top: 30px;">Select a project from the list on the left to view its tasks.</p>
             {% endif %}
-        </div>{# End panel-content #}
+        </div>
     </div>{# End Tasks Panel #}
 
-</main> {# End main-content grid #}
+</main>
 
+{# --- MODALS --- #}
 
-{# Edit Project Modal (Keep structure from previous version if using JS) #}
 <div id="edit-project-modal" class="modal">
     <div class="modal-content">
         <span class="close-btn">×</span>
         <h2>Edit Project</h2>
-        <form id="edit-project-form" method="POST"> {# Action URL set by JS #}
-             <div class="form-group">
-                 <label for="edit-project-name">Name:</label>
-                 <input type="text" id="edit-project-name" name="name" class="form-control" required>
-             </div>
-             <div class="form-group">
-                 <label for="edit-project-desc">Description:</label>
-                 <textarea id="edit-project-desc" name="description" class="form-control" rows="3"></textarea>
-             </div>
-             <div class="form-group">
-                 <label for="edit-project-status">Status:</label>
-                 <select id="edit-project-status" name="status" class="form-control">
-                     {% for status in options.project_status %}
-                     <option value="{{ status }}">{{ status }}</option>
-                     {% endfor %}
-                 </select>
-             </div>
-             <div class="form-row"> {# Use row for dates #}
-                 <div class="form-group">
-                     <label for="edit-project-start">Start Date:</label>
-                     <input type="date" id="edit-project-start" name="start_date" class="form-control">
-                 </div>
-                 <div class="form-group">
-                     <label for="edit-project-end">End Date:</label>
-                     <input type="date" id="edit-project-end" name="end_date" class="form-control">
-                 </div>
+        <form id="edit-project-form" method="POST">
+             <div class="form-group"> <label for="edit-project-name">Name:</label> <input type="text" id="edit-project-name" name="name" class="form-control" required> </div>
+             <div class="form-group"> <label for="edit-project-desc">Description:</label> <textarea id="edit-project-desc" name="description" class="form-control" rows="3"></textarea> </div>
+             <div class="form-group"> <label for="edit-project-status">Status:</label> <select id="edit-project-status" name="status" class="form-control"> {% for status in options.project_status %} <option value="{{ status }}">{{ status }}</option> {% endfor %} </select> </div>
+             <div class="form-row">
+                 <div class="form-group"> <label for="edit-project-start">Start Date:</label> <input type="date" id="edit-project-start" name="start_date" class="form-control"> </div>
+                 <div class="form-group"> <label for="edit-project-end">End Date:</label> <input type="date" id="edit-project-end" name="end_date" class="form-control"> </div>
              </div>
              <button type="submit" class="btn btn-primary">Save Changes</button>
+         </form>
+    </div>
+</div>
+
+<div id="edit-task-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">×</span>
+        <h2>Edit Task</h2>
+        <form id="edit-task-form" method="POST">
+            <input type="hidden" id="edit-task-project-id" name="project_id_for_redirect" value="{{ selected_project._id if selected_project else '' }}">
+             <div class="form-group"> <label for="edit-task-name">Name:</label> <input type="text" id="edit-task-name" name="name" class="form-control" required> </div>
+             <div class="form-group"> <label for="edit-task-desc">Description:</label> <textarea id="edit-task-desc" name="description" class="form-control" rows="3"></textarea> </div>
+             <div class="form-row">
+                 <div class="form-group"> <label for="edit-task-status">Status:</label> <select id="edit-task-status" name="status" class="form-control"> {% for status in options.task_status %} <option value="{{ status }}">{{ status }}</option> {% endfor %} </select> </div>
+                 <div class="form-group"> <label for="edit-task-priority">Priority:</label> <select id="edit-task-priority" name="priority" class="form-control"> {% for priority in options.task_priority %} <option value="{{ priority }}">{{ priority }}</option> {% endfor %} </select> </div>
+             </div>
+             <div class="form-row">
+                 <div class="form-group"> <label for="edit-task-due">Due Date:</label> <input type="date" id="edit-task-due" name="due_date" class="form-control"> </div>
+                 <div class="form-group"> <label for="edit-task-hours">Est. Hours:</label> <input type="number" id="edit-task-hours" name="estimated_hours" class="form-control" placeholder="e.g. 4 or 2.5" step="0.1" min="0"> </div>
+             </div>
+             <button type="submit" class="btn btn-primary">Save Changes</button>
+         </form>
+    </div>
+</div>
+
+<div id="log-time-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">×</span>
+        <h2>Log Time for: <span id="log-time-task-name">Task</span></h2>
+        <form id="log-time-form" method="POST">
+            <input type="hidden" id="log-time-project-id" name="project_id_for_redirect" value="{{ selected_project._id if selected_project else '' }}">
+            <div class="form-row">
+                <div class="form-group"> <label for="log-duration">Duration (minutes):</label> <input type="number" id="log-duration" name="duration_minutes" class="form-control" required min="1" step="1"> </div>
+                <div class="form-group"> <label for="log-date">Date:</label> <input type="date" id="log-date" name="log_date" class="form-control"> <small style="color: #a0b4d0; font-size: 12px;">(Leave blank for today)</small> </div>
+            </div>
+             <div class="form-group"> <label for="log-notes">Notes:</label> <textarea id="log-notes" name="log_notes" class="form-control" rows="3"></textarea> </div>
+             <button type="submit" class="btn btn-primary">Log Time</button>
          </form>
     </div>
 </div>
