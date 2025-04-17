@@ -7,6 +7,7 @@
     <div class="panel">
         <div class="panel-header">Projects</div>
         <div class="panel-content">
+            {# Project List #}
             <ul class="project-list">
                 {% if projects %}
                     {% for project in projects %}
@@ -15,19 +16,23 @@
                             {{ project.name | escape }}
                         </a>
                         <div class="project-actions">
+                             {# Delete Project Form #}
                              <form action="{{ url_for('delete_project', project_id_str=project._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete project \'{{ project.name|escape }}\' and ALL its tasks?');">
                                 <button type="submit" class="btn btn-danger btn-sm" title="Delete Project">Del</button>
                              </form>
+                             {# Edit Project Button #}
                             <button type="button" class="btn btn-secondary btn-sm edit-project-btn" title="Edit Project"
                                     data-project-id="{{ project._id }}"
-                                    data-project-data='{{ project | bson_tojson | safe }}'>Edit</button> {# Important: type="button" for modal triggers #}
+                                    data-project-data='{{ project | bson_tojson | safe }}'>Edit</button>
                          </div>
                     </li>
                     {% endfor %}
                 {% else %}
-                    <li style="color: #a0b4d0; font-style: italic;">No projects found.</li>
+                    <li style="color: #a0b4d0; font-style: italic; padding: 10px 8px;">No projects found.</li>
                 {% endif %}
             </ul>
+
+            {# Add New Project Form #}
             <div class="add-form">
                 <div class="add-form-title">Add New Project</div>
                 <form action="{{ url_for('add_project') }}" method="POST">
@@ -50,36 +55,49 @@
         </div>
         <div class="panel-content">
             {% if selected_project %}
-                <table class="task-table">
-                    <thead> <tr> <th>Name</th><th>Status</th><th>Priority</th><th>Due Date</th><th>Logged</th><th>Est.</th><th>Actions</th> </tr> </thead>
-                    <tbody>
-                        {% if tasks %}
-                            {% for task in tasks %}
-                            <tr>
-                                <td>{{ task.name | escape }}</td>
-                                <td><span class="status-badge status-{{ task.status | lower | replace(' ', '') }}">{{ task.status }}</span></td>
-                                <td><span class="priority-badge priority-{{ task.priority | lower }}">{{ task.priority }}</span></td>
-                                <td>{{ task.due_date | dateformat }}</td>
-                                <td>{{ task.total_logged_minutes | durationformat }}</td>
-                                <td>{{ task.estimated_hours ~ 'h' if task.estimated_hours is not none else '–' }}</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button type="button" class="action-btn edit-task-btn" title="Edit Task" data-task-id="{{ task._id }}" data-task-data='{{ task | bson_tojson | safe }}'>Edit</button> {# Use type="button" #}
-                                        <form action="{{ url_for('delete_task', task_id_str=task._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete task \'{{ task.name|escape }}\'?');">
-                                             <input type="hidden" name="project_id_for_redirect" value="{{ selected_project._id }}">
-                                             <button type="submit" class="action-btn delete-task-btn" title="Delete Task" style="color:#dc3545;">Del</button> {# Style delete link #}
-                                        </form>
-                                        <button type="button" class="action-btn log-time-btn" title="Log Time" data-task-id="{{ task._id }}" data-task-name="{{ task.name | escape }}">Log</button> {# Use type="button" #}
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr id="no-tasks-row"><td colspan="7">No tasks found for this project.</td></tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                {# Task Table #}
+                <div class="table-responsive"> {# Add wrapper for potential horizontal scroll on small screens #}
+                    <table class="task-table">
+                        <thead> <tr> <th>Name</th><th>Status</th><th>Priority</th><th>Due Date</th><th>Logged</th><th>Est.</th><th>Actions</th> </tr> </thead>
+                        <tbody>
+                            {% if tasks %}
+                                {% for task in tasks %}
+                                <tr>
+                                    <td>{{ task.name | escape }}</td>
+                                    <td><span class="status-badge status-{{ task.status | lower | replace(' ', '') }}">{{ task.status }}</span></td>
+                                    <td><span class="priority-badge priority-{{ task.priority | lower }}">{{ task.priority }}</span></td>
+                                    <td>{{ task.due_date | dateformat }}</td>
+                                    <td>{{ task.total_logged_minutes | durationformat }}</td>
+                                    <td>{{ task.estimated_hours ~ 'h' if task.estimated_hours is not none else '–' }}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            {# Edit Task Button - Triggers Modal #}
+                                            <button type="button" class="action-btn edit-task-btn" title="Edit Task"
+                                                    data-task-id="{{ task._id }}"
+                                                    data-task-data='{{ task | bson_tojson | safe }}'>Edit</button>
 
+                                            {# Delete Task Form #}
+                                            <form action="{{ url_for('delete_task', task_id_str=task._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete task \'{{ task.name|escape }}\'?');">
+                                                 <input type="hidden" name="project_id_for_redirect" value="{{ selected_project._id }}">
+                                                 <button type="submit" class="action-btn delete-task-btn" title="Delete Task" style="color:#dc3545;">Del</button>
+                                            </form>
+
+                                            {# Log Time Button - Triggers Modal #}
+                                            <button type="button" class="action-btn log-time-btn" title="Log Time"
+                                                    data-task-id="{{ task._id }}"
+                                                    data-task-name="{{ task.name | escape }}">Log</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr id="no-tasks-row"><td colspan="7">No tasks found for this project.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div> {# End table-responsive #}
+
+                {# Add New Task Form #}
                 <div class="add-form">
                     <div class="add-form-title">Add New Task to {{ selected_project.name | escape }}</div>
                     <form action="{{ url_for('add_task', project_id_str=selected_project._id) }}" method="POST">
@@ -96,13 +114,15 @@
                         <button type="submit" class="btn btn-primary">Add Task</button>
                     </form>
                 </div>
+
             {% else %}
                 <p style="text-align: center; color: #a0b4d0; margin-top: 30px;">Select a project from the list on the left to view its tasks.</p>
             {% endif %}
-        </div>
+        </div>{# End panel-content #}
     </div>{# End Tasks Panel #}
 
-</main>
+</main> {# End main-content grid #}
+
 
 {# --- MODALS --- #}
 
@@ -127,8 +147,10 @@
     <div class="modal-content">
         <span class="close-btn">×</span>
         <h2>Edit Task</h2>
-        <form id="edit-task-form" method="POST">
+        <form id="edit-task-form" method="POST"> {# Action set by JS #}
+            {# ** Crucial hidden field ** #}
             <input type="hidden" id="edit-task-project-id" name="project_id_for_redirect" value="{{ selected_project._id if selected_project else '' }}">
+
              <div class="form-group"> <label for="edit-task-name">Name:</label> <input type="text" id="edit-task-name" name="name" class="form-control" required> </div>
              <div class="form-group"> <label for="edit-task-desc">Description:</label> <textarea id="edit-task-desc" name="description" class="form-control" rows="3"></textarea> </div>
              <div class="form-row">
@@ -148,8 +170,10 @@
     <div class="modal-content">
         <span class="close-btn">×</span>
         <h2>Log Time for: <span id="log-time-task-name">Task</span></h2>
-        <form id="log-time-form" method="POST">
+        <form id="log-time-form" method="POST"> {# Action set by JS #}
+             {# ** Crucial hidden field ** #}
             <input type="hidden" id="log-time-project-id" name="project_id_for_redirect" value="{{ selected_project._id if selected_project else '' }}">
+
             <div class="form-row">
                 <div class="form-group"> <label for="log-duration">Duration (minutes):</label> <input type="number" id="log-duration" name="duration_minutes" class="form-control" required min="1" step="1"> </div>
                 <div class="form-group"> <label for="log-date">Date:</label> <input type="date" id="log-date" name="log_date" class="form-control"> <small style="color: #a0b4d0; font-size: 12px;">(Leave blank for today)</small> </div>
