@@ -1,205 +1,62 @@
-body {
-    font-family: sans-serif;
-    margin: 0;
-    line-height: 1.6;
-    background-color: #f4f4f4;
-    color: #333;
-}
+/* static/css/style.css */
+body { font-family: sans-serif; margin: 0; line-height: 1.6; background-color: #f8f9fa; color: #333; }
+.container { max-width: 1400px; margin: 20px auto; padding: 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 5px; }
+header { background-color: #343a40; color: #fff; padding: 15px 0; text-align: center; margin-bottom: 20px; }
+header a { color: #fff; text-decoration: none; font-size: 1.5em; }
+footer { text-align: center; margin-top: 40px; padding: 15px; color: #6c757d; font-size: 0.9em; border-top: 1px solid #dee2e6; }
+.layout-container { display: flex; gap: 30px; }
+.sidebar { flex: 0 0 320px; padding-right: 20px; border-right: 1px solid #dee2e6; }
+.main-content { flex: 1; }
+h2, h3 { color: #495057; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 15px; }
+hr { border: 0; height: 1px; background: #eee; margin: 20px 0; }
 
-.container {
-    max-width: 1400px;
-    margin: 20px auto;
-    padding: 15px;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-header {
-    background-color: #333;
-    color: #fff;
-    padding: 10px 0;
-    text-align: center;
-}
-header a {
-    color: #fff;
-    text-decoration: none;
-}
-
-footer {
-    text-align: center;
-    margin-top: 30px;
-    padding: 10px;
-    color: #777;
-    font-size: 0.9em;
-}
-
-.layout-container {
-    display: flex;
-    gap: 20px;
-}
-
-.sidebar {
-    flex: 0 0 300px; /* Fixed width sidebar */
-    padding-right: 15px;
-    border-right: 1px solid #ccc;
-}
-
-.main-content {
-    flex: 1; /* Takes remaining space */
-}
-
-.projects-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.projects-sidebar li {
-    padding: 8px 5px;
-    border-bottom: 1px dotted #eee;
-    cursor: pointer;
-    display: flex; /* Use flexbox for alignment */
-    justify-content: space-between; /* Push buttons to the right */
-    align-items: center;
-}
-.projects-sidebar li:hover {
-    background-color: #f0f0f0;
-}
- .projects-sidebar li.selected {
-    background-color: #ddd;
-    font-weight: bold;
-}
-.projects-sidebar li a {
-    text-decoration: none;
-    color: #333;
-    flex-grow: 1; /* Allow link text to take up space */
-    margin-right: 10px; /* Space before buttons */
-}
-
+/* Project List */
+.project-list ul { list-style: none; padding: 0; margin: 0; }
+.project-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; border-bottom: 1px dotted #eee; transition: background-color 0.2s ease; }
+.project-list li:hover { background-color: #e9ecef; }
+.project-list li.selected { background-color: #ddeeff; font-weight: bold; border-left: 3px solid #007bff; padding-left: 5px;}
+.project-list li a.project-link { text-decoration: none; color: #007bff; flex-grow: 1; margin-right: 10px; }
+.project-list li a:hover { text-decoration: underline; }
+.project-actions { white-space: nowrap; } /* Keep buttons on one line */
 
 /* Forms */
-form label {
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 3px;
-    font-weight: bold;
+form label { display: block; margin-top: 12px; margin-bottom: 4px; font-weight: 600; font-size: 0.95em; color: #495057; }
+form input[type="text"], form input[type="date"], form input[type="number"], form textarea, form select {
+    width: 100%; padding: 9px 12px; margin-bottom: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 1em;
 }
-form input[type="text"],
-form input[type="date"],
-form input[type="number"],
-form textarea,
-form select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    box-sizing: border-box; /* Include padding in width */
-}
+form textarea { min-height: 60px; }
 form button[type="submit"] {
-    background-color: #5cb85c;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
+    background-color: #28a745; color: white; padding: 10px 18px; border: none; border-radius: 4px; cursor: pointer; margin-top: 15px; font-size: 1em; transition: background-color 0.2s ease;
 }
-form button[type="submit"]:hover {
-    background-color: #4cae4c;
-}
+form button[type="submit"]:hover { background-color: #218838; }
+.add-project-form, .add-task-form { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px; border: 1px solid #eee;}
 
-/* Simple link-like buttons */
-.btn-link {
-    background: none;
-    border: none;
-    color: #007bff;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0 3px; /* Minimal padding */
-    font-size: 0.9em;
-}
-.btn-link:hover {
-    color: #0056b3;
-}
-.delete-btn {
-    color: red;
-}
-.delete-btn:hover {
-    color: darkred;
-}
-
+/* Link-like Buttons */
+.btn-link { background: none; border: none; color: #007bff; text-decoration: none; cursor: pointer; padding: 0 4px; font-size: 0.9em; vertical-align: middle; }
+.btn-link:hover { color: #0056b3; text-decoration: underline;}
+.delete-btn { color: #dc3545; }
+.delete-btn:hover { color: #c82333; }
 
 /* Task Table */
-#task-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-#task-table th, #task-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-#task-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-#task-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-#task-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
+#task-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+#task-table th, #task-table td { border: 1px solid #dee2e6; padding: 10px 12px; text-align: left; vertical-align: top; }
+#task-table th { background-color: #e9ecef; font-weight: 600; font-size: 0.95em; }
+#task-table tbody tr:nth-child(even) { background-color: #f8f9fa; }
+#task-table tbody tr:hover { background-color: #f1f1f1; }
+#task-table td:last-child { white-space: nowrap; width: 1%; } /* Prevent action buttons wrapping */
 
 /* Flash Messages */
-.flash-messages { margin-bottom: 15px; }
-.alert {
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-}
+.flash-messages { margin-bottom: 15px; padding: 0; list-style: none; }
+.alert { padding: 12px 15px; margin-bottom: 15px; border: 1px solid transparent; border-radius: 4px; }
 .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
 .alert-error { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
 .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
 .alert-info { color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb; }
 
-
 /* Modal Styles */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto; /* 10% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more specific */
-    max-width: 500px;
-    position: relative;
-}
-
-.close-btn {
-    color: #aaa;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close-btn:hover,
-.close-btn:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fefefe; margin: 10% auto; padding: 25px 30px; border: 1px solid #888; width: 90%; max-width: 550px; border-radius: 5px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.close-btn { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; line-height: 1; }
+.close-btn:hover, .close-btn:focus { color: black; text-decoration: none; cursor: pointer; }
+.modal h2 { margin-top: 0; color: #343a40; }
+.modal form label { margin-top: 8px; }

@@ -10,14 +10,19 @@
                 <ul>
                     {% for project in projects %}
                     <li class="{{ 'selected' if selected_project and project._id == selected_project._id else '' }}">
-                        <a href="{{ url_for('index', project_id=project._id) }}" data-project-id="{{ project._id }}" class="project-link">
+                        {# Link to view this project's tasks #}
+                        <a href="{{ url_for('index', project_id=project._id) }}" class="project-link">
                             {{ project.name }}
                         </a>
-                        <!-- Simple Edit/Delete Links/Forms -->
-                         <form action="{{ url_for('delete_project', project_id_str=project._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete project \'{{ project.name }}\' and ALL its tasks?');">
-                            <button type="submit" class="btn-link delete-btn">Del</button>
-                         </form>
-                        <button class="btn-link edit-project-btn" data-project-id="{{ project._id }}" data-project-data='{{ project | tojson | safe }}'>Edit</button>
+                        {# Action buttons for the project #}
+                        <div class="project-actions">
+                             <form action="{{ url_for('delete_project', project_id_str=project._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete project \'{{ project.name|escape }}\' and ALL its tasks?');">
+                                <button type="submit" class="btn-link delete-btn" title="Delete Project">Del</button>
+                             </form>
+                            <button class="btn-link edit-project-btn" title="Edit Project"
+                                    data-project-id="{{ project._id }}"
+                                    data-project-data='{{ project | bson_tojson | safe }}'>Edit</button> {# Use bson_tojson filter #}
+                         </div>
                     </li>
                     {% endfor %}
                 </ul>
@@ -33,7 +38,7 @@
             <input type="text" id="project-name" name="name" required>
 
             <label for="project-desc">Description:</label>
-            <textarea id="project-desc" name="description"></textarea>
+            <textarea id="project-desc" name="description" rows="3"></textarea>
 
             <label for="project-status">Status:</label>
             <select id="project-status" name="status">
@@ -55,7 +60,7 @@
     <!-- Main Task Area -->
     <section class="main-content tasks-area">
         {% if selected_project %}
-            <h2>Tasks for: <span id="project-name-heading">{{ selected_project.name }}</span></h2>
+            <h2>Tasks for: <span id="project-name-heading">{{ selected_project.name | escape }}</span></h2>
 
             <div class="task-list-container">
                 <table id="task-table">
@@ -74,14 +79,14 @@
                         {% if tasks %}
                             {% for task in tasks %}
                             <tr>
-                                <td>{{ task.name }}</td>
+                                <td>{{ task.name | escape }}</td>
                                 <td>{{ task.status }}</td>
                                 <td>{{ task.priority }}</td>
                                 <td>{{ task.due_date | dateformat }}</td>
                                 <td>{{ task.total_logged_minutes | durationformat }}</td>
                                 <td>{{ task.estimated_hours ~ 'h' if task.estimated_hours is not none else 'N/A' }}</td>
                                 <td>
-                                    <!-- Add Edit/Delete/Log Time buttons/links here -->
+                                    {# Placeholders for task actions #}
                                     <button class="btn-link edit-task-btn" data-task-id="{{ task._id }}">Edit</button>
                                     <button class="btn-link delete-task-btn" data-task-id="{{ task._id }}">Del</button>
                                     <button class="btn-link log-time-btn" data-task-id="{{ task._id }}">Log</button>
@@ -96,13 +101,13 @@
             </div>
 
             <hr>
-            <h3>Add New Task</h3>
+            <h3>Add New Task to {{ selected_project.name | escape }}</h3>
              <form action="{{ url_for('add_task', project_id_str=selected_project._id) }}" method="POST" class="add-task-form">
                 <label for="task-name">Name:</label>
                 <input type="text" id="task-name" name="name" required>
 
                 <label for="task-desc">Description:</label>
-                <textarea id="task-desc" name="description"></textarea>
+                <textarea id="task-desc" name="description" rows="2"></textarea>
 
                 <label for="task-status">Status:</label>
                 <select id="task-status" name="status">
@@ -122,7 +127,7 @@
                 <input type="date" id="task-due" name="due_date">
 
                 <label for="task-est-hours">Est. Hours:</label>
-                <input type="number" id="task-est-hours" name="estimated_hours" step="0.5" min="0">
+                <input type="number" id="task-est-hours" name="estimated_hours" step="0.5" min="0" placeholder="e.g., 4 or 2.5">
 
                 <button type="submit">Add Task</button>
             </form>
@@ -134,20 +139,18 @@
     </section>
 </div>
 
-
 <!-- Modal for Editing Project (Initially Hidden) -->
 <div id="edit-project-modal" class="modal">
     <div class="modal-content">
         <span class="close-btn">×</span>
         <h2>Edit Project</h2>
-        <form id="edit-project-form" method="POST"> {# Action set by JS #}
-             <input type="hidden" id="edit-project-id" name="project_id"> {# Although ID is in URL #}
-
+        <form id="edit-project-form" method="POST"> {# Action URL set by JS #}
+             {# No hidden ID needed if action URL contains it #}
              <label for="edit-project-name">Name:</label>
              <input type="text" id="edit-project-name" name="name" required>
 
              <label for="edit-project-desc">Description:</label>
-             <textarea id="edit-project-desc" name="description"></textarea>
+             <textarea id="edit-project-desc" name="description" rows="3"></textarea>
 
              <label for="edit-project-status">Status:</label>
              <select id="edit-project-status" name="status">
@@ -169,9 +172,5 @@
 {% endblock %}
 
 {% block scripts_extra %}
-  {# Pass base URL for API calls if needed, or construct in JS #}
-  <script>
-      // Example: const API_BASE_URL = "{{ url_for('index', _external=True) }}api";
-      // Or just use relative paths in fetch like '/api/projects/...'
-  </script>
+  {# No extra scripts needed here currently #}
 {% endblock %}

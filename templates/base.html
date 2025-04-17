@@ -10,10 +10,10 @@
 <body>
     <header>
         <h1><a href="{{ url_for('index') }}">{{ title | default('Project Management') }}</a></h1>
-        <!-- Add navigation if needed -->
     </header>
 
     <main class="container">
+        {# Display flash messages #}
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flash-messages">
@@ -25,12 +25,12 @@
         {% endwith %}
 
         {% block content %}
-        <!-- Page content goes here -->
+        <!-- Page specific content goes here -->
         {% endblock %}
     </main>
 
     <footer>
-        {# Corrected line below #}
+        {# Correct usage of now from context processor #}
         <p>© {{ now.year }} Your Project App</p>
     </footer>
 
