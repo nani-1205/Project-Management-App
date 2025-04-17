@@ -3,37 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ title | default('Project App') }}{% endblock %}</title>
+    <title>{% block title %}{{ title | default('Project Pilot') }}{% endblock %}</title>
+    {# Link to the updated CSS file #}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block head_extra %}{% endblock %}
 </head>
 <body>
-    <header>
-        <h1><a href="{{ url_for('index') }}">{{ title | default('Project Management') }}</a></h1>
+    {# Starfield Background Element #}
+    <div class="star-effect" id="starfield"></div>
+
+    {# New Header Structure #}
+    <header class="header">
+        <div class="header-content">
+            <a href="{{ url_for('index') }}" class="logo"> {# Make logo a link to home #}
+                <div class="logo-icon">🚀</div>
+                <span>Project Pilot</span> {# Use span if needed, or just text #}
+            </a>
+            <div class="nav-controls">
+                {# Add real links or functionality later if needed #}
+                <button class="nav-btn">Dashboard</button>
+                <button class="nav-btn">Settings</button>
+                <button class="nav-btn">Help</button>
+            </div>
+        </div>
     </header>
 
-    <main class="container">
-        {# Display flash messages #}
+    {# Main application container #}
+    <div class="app-container">
+        {# Flash Messages - Place them prominently #}
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flash-messages">
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}">{{ message | escape }}</div>
                 {% endfor %}
                 </div>
             {% endif %}
         {% endwith %}
 
+        {# Content Block for specific pages like index.html #}
         {% block content %}
-        <!-- Page specific content goes here -->
         {% endblock %}
-    </main>
+    </div>
 
-    <footer>
-        {# Correct usage of now from context processor #}
-        <p>© {{ now.year }} Your Project App</p>
+    {# New Footer Structure #}
+    <footer class="footer">
+         {# Footer content (already includes year via context processor) #}
+         © {{ now.year }} Your Project App
     </footer>
 
+    {# Link to the updated JS file #}
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% block scripts_extra %}{% endblock %}
 </body>
