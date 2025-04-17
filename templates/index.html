@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="layout-container">
+    <!-- Projects Sidebar -->
+    <aside class="sidebar projects-sidebar">
+        <h2>Projects</h2>
+        <div class="project-list">
+            {% if projects %}
+                <ul>
+                    {% for project in projects %}
+                    <li class="{{ 'selected' if selected_project and project._id == selected_project._id else '' }}">
+                        <a href="{{ url_for('index', project_id=project._id) }}" data-project-id="{{ project._id }}" class="project-link">
+                            {{ project.name }}
+                        </a>
+                        <!-- Simple Edit/Delete Links/Forms -->
+                         <form action="{{ url_for('delete_project', project_id_str=project._id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete project \'{{ project.name }}\' and ALL its tasks?');">
+                            <button type="submit" class="btn-link delete-btn">Del</button>
+                         </form>
+                        <button class="btn-link edit-project-btn" data-project-id="{{ project._id }}" data-project-data='{{ project | tojson | safe }}'>Edit</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No projects found.</p>
+            {% endif %}
+        </div>
+
+        <hr>
+        <h3>Add New Project</h3>
+        <form action="{{ url_for('add_project') }}" method="POST" class="add-project-form">
+            <label for="project-name">Name:</label>
+            <input type="text" id="project-name" name="name" required>
+
+            <label for="project-desc">Description:</label>
+            <textarea id="project-desc" name="description"></textarea>
+
+            <label for="project-status">Status:</label>
+            <select id="project-status" name="status">
+                {% for status in options.project_status %}
+                <option value="{{ status }}">{{ status }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="project-start">Start Date:</label>
+            <input type="date" id="project-start" name="start_date">
+
+            <label for="project-end">End Date:</label>
+            <input type="date" id="project-end" name="end_date">
+
+            <button type="submit">Add Project</button>
+        </form>
+    </aside>
+
+    <!-- Main Task Area -->
+    <section class="main-content tasks-area">
+        {% if selected_project %}
+            <h2>Tasks for: <span id="project-name-heading">{{ selected_project.name }}</span></h2>
+
+            <div class="task-list-container">
+                <table id="task-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Due Date</th>
+                            <th>Logged</th>
+                            <th>Est.</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="task-list-body">
+                        {% if tasks %}
+                            {% for task in tasks %}
+                            <tr>
+                                <td>{{ task.name }}</td>
+                                <td>{{ task.status }}</td>
+                                <td>{{ task.priority }}</td>
+                                <td>{{ task.due_date | dateformat }}</td>
+                                <td>{{ task.total_logged_minutes | durationformat }}</td>
+                                <td>{{ task.estimated_hours ~ 'h' if task.estimated_hours is not none else 'N/A' }}</td>
+                                <td>
+                                    <!-- Add Edit/Delete/Log Time buttons/links here -->
+                                    <button class="btn-link edit-task-btn" data-task-id="{{ task._id }}">Edit</button>
+                                    <button class="btn-link delete-task-btn" data-task-id="{{ task._id }}">Del</button>
+                                    <button class="btn-link log-time-btn" data-task-id="{{ task._id }}">Log</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr id="no-tasks-row"><td colspan="7">No tasks found for this project.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+            <h3>Add New Task</h3>
+             <form action="{{ url_for('add_task', project_id_str=selected_project._id) }}" method="POST" class="add-task-form">
+                <label for="task-name">Name:</label>
+                <input type="text" id="task-name" name="name" required>
+
+                <label for="task-desc">Description:</label>
+                <textarea id="task-desc" name="description"></textarea>
+
+                <label for="task-status">Status:</label>
+                <select id="task-status" name="status">
+                    {% for status in options.task_status %}
+                    <option value="{{ status }}">{{ status }}</option>
+                    {% endfor %}
+                </select>
+
+                 <label for="task-priority">Priority:</label>
+                <select id="task-priority" name="priority">
+                    {% for priority in options.task_priority %}
+                    <option value="{{ priority }}" {{ 'selected' if priority == 'Medium' }}>{{ priority }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="task-due">Due Date:</label>
+                <input type="date" id="task-due" name="due_date">
+
+                <label for="task-est-hours">Est. Hours:</label>
+                <input type="number" id="task-est-hours" name="estimated_hours" step="0.5" min="0">
+
+                <button type="submit">Add Task</button>
+            </form>
+
+        {% else %}
+            <h2>Select a project to view tasks</h2>
+            <p>Choose a project from the list on the left.</p>
+        {% endif %}
+    </section>
+</div>
+
+
+<!-- Modal for Editing Project (Initially Hidden) -->
+<div id="edit-project-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">×</span>
+        <h2>Edit Project</h2>
+        <form id="edit-project-form" method="POST"> {# Action set by JS #}
+             <input type="hidden" id="edit-project-id" name="project_id"> {# Although ID is in URL #}
+
+             <label for="edit-project-name">Name:</label>
+             <input type="text" id="edit-project-name" name="name" required>
+
+             <label for="edit-project-desc">Description:</label>
+             <textarea id="edit-project-desc" name="description"></textarea>
+
+             <label for="edit-project-status">Status:</label>
+             <select id="edit-project-status" name="status">
+                 {% for status in options.project_status %}
+                 <option value="{{ status }}">{{ status }}</option>
+                 {% endfor %}
+             </select>
+
+             <label for="edit-project-start">Start Date:</label>
+             <input type="date" id="edit-project-start" name="start_date">
+
+             <label for="edit-project-end">End Date:</label>
+             <input type="date" id="edit-project-end" name="end_date">
+
+             <button type="submit">Save Changes</button>
+         </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+  {# Pass base URL for API calls if needed, or construct in JS #}
+  <script>
+      // Example: const API_BASE_URL = "{{ url_for('index', _external=True) }}api";
+      // Or just use relative paths in fetch like '/api/projects/...'
+  </script>
+{% endblock %}

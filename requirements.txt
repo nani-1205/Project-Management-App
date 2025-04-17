@@ -1,5 +1,4 @@
+Flask>=2.0
 pymongo
-customtkinter
-Pillow
 python-dotenv
-tkcalendar
+# requests # Optional: Might be needed later if your app calls external APIs
